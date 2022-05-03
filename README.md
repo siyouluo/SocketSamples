@@ -1,5 +1,5 @@
 # Socket 网络编程
-为了实现对工业机器人的控制，需要实现一个windows下的socket客户端，通过局域网连接，与运行在机器人主机上的服务器进行通信。本项目借此系统地整理学习一下socket网络编程相关知识。  
+为了对工业机器人进行控制，需要实现一个windows下的socket客户端，通过局域网连接，与运行在机器人主机上的服务器进行通信。本项目借此系统地整理学习一下socket网络编程相关知识。  
 为了方便，本项目大多数代码运行在windows平台上，同时部分代码会在linux系统上进行测试(因为实际使用的机器人控制系统是基于linux平台的开发的)
 
 **环境:**  
@@ -26,11 +26,18 @@
 # WinSock2
 
 - [WinSock 2 Information](http://www.sockets.com/winsock2.htm)
+- [WinSock2 API](https://docs.microsoft.com/en-us/windows/win32/api/winsock2/)
 
 在windows下进行socket开发优先使用`WinSock2`, 需要在程序中引入如下依赖文件:  
 - 头文件: `WinSock2.h`, `Windows.h`
 - 静态链接库: `WS2_32.Lib`
 - 动态链接库: `ws2_32.dll`  
+
+**注意:**  
+一般情况下, `windows`平台上文件和路径名不区分大小写，因此许多地方在引入头文件或者库文件时，使用的文件名与实际的大小写并不一致，这在windows上是可行的. 
+而在`linux`系统上通常文件名是大小写敏感的，必须与实际一致.
+
+更确切地说, 是否`大小写敏感`取决于文件系统，在windows上是可选的，而大多数unix系统上的文件系统是大小写敏感的. 参考: https://stackoverflow.com/a/1951969 
 
 **注意:**   
 头文件`WinSock2.h`在整个工程中的引入顺序必须先于`Windows.h`, 因为查看`Windows.h`发现其中有如下代码段, 当`WIN32_LEAN_AND_MEAN`和`_MAC`都没有被定义时，将会引入`winsock.h`头文件. 
@@ -98,19 +105,25 @@ error C2143: 语法错误 : 缺少“;”(在“常量”的前面)
 - 在预处理器定义中添加`WIN32_LEAN_AND_MEAN`, 保证`winsock.h`绝对不会被`Windows.h`引入;
     例如`Visual Studio`中: `配置属性`->`C/C++`->`预处理器`->`预处理器定义`第一行添加`WIN32_LEAN_AND_MEAN`.
 
+通过定义`WIN32_LEAN_AND_MEAN`可以精简`Window.h`头文件的大小，定义后会去除掉一些不那么常用的API,例如`Cryptography`, `DDE`, `RPC`, `Shell`, `Windows Sockets`.  
 
 **参考:**  
 - [can't include windows.h before winsock2.h - stackoverflow](https://stackoverflow.com/questions/9153911/is-there-a-difference-between-winsock-h-and-winsock2-h/9168850#9168850)
+- [Faster Builds with Smaller Header Files - docs.microsoft](https://docs.microsoft.com/en-us/windows/win32/winprog/using-the-windows-headers#faster-builds-with-smaller-header-files)
 - [error C2011: “sockaddr”:“struct”类型重定义错误 ----解决办法](https://blog.csdn.net/ccnu027cs/article/details/103593923?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_baidulandingword-1&spm=1001.2101.3001.4242)
 - [WinSock1.1和WinSock2.0 - 博客园](https://www.cnblogs.com/MakeView660/p/9237990.html)
 
 # 项目例程
-- [基础TCP/IP通信](doc/basic_tcp_ip.md)
-- [封装TCP/IP通信代码](doc/object_oriented_tcp_ip.md)
-- [非阻塞的TCP/IP客户端](doc/non_block_tcp_ip.md)
+- [基础知识](doc/basic_info.md)
+- [基础TCP/IP通信](doc/basic_tcp.md)
+- [封装TCP/IP通信代码](doc/object_oriented_tcp.md)
+- [非阻塞的TCP/IP客户端](doc/non_block_tcp.md)
 
 # 参考教程
 
 - [C/C++ socket编程教程 - C语言中文网](http://c.biancheng.net/cpp/socket/)
 - [Socket编程指南及示例程序](http://www.blogjava.net/wxb_nudt/archive/2007/11/01/157623.html)
+
+# C++网络库
+- [Asio C++ Library : 用于网络和底层I/O编程的跨平台的C++库](https://think-async.com/Asio/)
 
