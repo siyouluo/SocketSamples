@@ -26,6 +26,8 @@ message(STATUS "socket server & client")
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
 add_executable(client client.cpp)
 add_executable(server server.cpp)
+target_link_libraries(client WS2_32)
+target_link_libraries(server WS2_32)
 
 install(TARGETS client DESTINATION bin)
 install(TARGETS server DESTINATION bin)
