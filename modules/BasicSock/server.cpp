@@ -1,7 +1,7 @@
-//server.cpp
 #include <stdio.h>
-#include <winsock2.h>
-#pragma comment (lib, "ws2_32.lib")  //加载 ws2_32.dll
+#include <stdlib.h>
+#include <WinSock2.h>
+#pragma comment(lib, "ws2_32.lib")  //加载 ws2_32.dll
 
 int main() {
 	//初始化 DLL
@@ -38,5 +38,6 @@ int main() {
 	//终止 DLL 的使用
 	WSACleanup();
 
+	system("pause");
 	return 0;
 }

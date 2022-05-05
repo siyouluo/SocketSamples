@@ -9,6 +9,29 @@
 - `CMake 3.18.5`
 - `winsock2`
 
+## 关于文件编码格式
+在`Visual Studio`中的代码文件编码格式仅支持`GB2312`和`UTF-8 with BOM`, 不支持`UTF-8`. 
+但由于个人偏好问题，我的代码都是使用`UTF-8`编码的，如果直接通过`Visual Studio`进行编译，可能会报出如下警告.  
+```txt
+warning C4819: 该文件包含不能在当前代码页(936)中表示的字符
+```
+编码格式问题有时甚至会导致`error`, 并且输出的错误信息与实际文件驴唇不对马嘴.
+
+要解决这个问题，可以给`msvc`添加编译选项`/source-charset:utf-8`,让编译器知道编码字符集为`utf-8`.   
+- 如果是从`CMake`生成VS工程，可以在`CMakeLists.txt`中添加:
+    ```cmake
+    if (MSVC)
+        # 设置 msvc 代码编码格式为 utf-8
+        set(CMAKE_C_FLAGS "/source-charset:utf-8 ${CMAKE_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS "/source-charset:utf-8 ${CMAKE_CXX_FLAGS}")
+        message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+        message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    endif()
+    ```
+- 如果是直接在VS中新建工程，可以执行: `右键项目`->`属性`->`配置属性`->`C/C++`->`命令行`->`其他选项`->输入`%(AdditionalOptions) /source-charset:utf-8`
+
+**参考:**  
+- [vscode 中 warning C4819: 该文件包含不能在当前代码页(936)中表示的字符 - CSDN](https://blog.csdn.net/qq_38026359/article/details/107188429)
 # Socket 简介
 > 80年代初，美国政府的高级研究工程机构（ARPA）给加利福尼亚大学Berkeley分校提供了资金，让他们在UNIX操作系统下实现TCP/IP协议。在这个项目中，研究人员为TCP/IP网络通信开发了一个API（应用程序接口）。这个API称为Socket接口（套接字）。今天，SOCKET接口是TCP/IP网络最为通用的API，也是在INTERNET上进行应用开发最为通用的API。
 
