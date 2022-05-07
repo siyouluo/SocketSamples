@@ -133,13 +133,14 @@ error C2143: 语法错误 : 缺少“;”(在“常量”的前面)
 **参考:**  
 - [can't include windows.h before winsock2.h - stackoverflow](https://stackoverflow.com/questions/9153911/is-there-a-difference-between-winsock-h-and-winsock2-h/9168850#9168850)
 - [Faster Builds with Smaller Header Files - docs.microsoft](https://docs.microsoft.com/en-us/windows/win32/winprog/using-the-windows-headers#faster-builds-with-smaller-header-files)
+- [The WIN32_LEAN_AND_MEAN macro prevents the Winsock.h from being included by the Windows.h header](https://docs.microsoft.com/en-us/windows/win32/winsock/creating-a-basic-winsock-application)
 - [error C2011: “sockaddr”:“struct”类型重定义错误 ----解决办法](https://blog.csdn.net/ccnu027cs/article/details/103593923?utm_medium=distribute.pc_relevant.none-task-blog-baidujs_baidulandingword-1&spm=1001.2101.3001.4242)
 - [WinSock1.1和WinSock2.0 - 博客园](https://www.cnblogs.com/MakeView660/p/9237990.html)
 
 # 项目例程
 - [基础知识](doc/basic_info.md)
 - [基础TCP/IP通信](doc/basic_tcp.md)
-- [封装TCP/IP通信代码](doc/object_oriented_tcp.md)
+- [封装TCP/IP通信代码](doc/socket_class_raii.md)
 - [非阻塞的TCP/IP客户端](doc/non_block_tcp.md)
 
 # 参考教程
