@@ -1,19 +1,18 @@
-#ifndef SERVERSOCKET_H
-#define SERVERSOCKET_H
+#ifndef CLIENTSOCKET_H
+#define CLIENTSOCKET_H
 
 #include <WinSock2.h>
 #include <string>
 
-class ServerSocket
+class ClientSocket
 {
 public:
-    ServerSocket();
-    ~ServerSocket();
+    ClientSocket();
+    ~ClientSocket();
 
     bool DoInit();
     bool DoBind(const char* ip, unsigned short port);
-    bool DoListen(int backlog = SOMAXCONN);
-    bool DoAccept();
+    bool DoConnect(const char* ip, unsigned short port);
     bool DoShutdown();
     bool Send(const char* buf, int len);
     bool Send(const std::string& str);
@@ -21,13 +20,13 @@ public:
     bool Recv(std::string& str);
 private:
     bool   m_bInit;
-    SOCKET m_listenfd;
+    bool   m_bConnected;
     SOCKET m_clientfd;
     static const unsigned int m_recv_buff_size = 1024;// 最多接收 m_recv_buff_size 个字符
 	char m_recv_buff[m_recv_buff_size + 1] = {0};// 最后预留一个给'\0'
 };
 
-#endif /* SERVERSOCKET_H */
+#endif /* CLIENTSOCKET_H */
 
 
 

@@ -10,6 +10,9 @@ modules\SocketRAII
 |   CMakeLists.txt
 |
 +---ClientSocket
+|       ClientSocket.cpp
+|       ClientSocket.h
+|       test_ClientSocket.cpp
 +---ServerSocket
 |       ServerSocket.cpp
 |       ServerSocket.h

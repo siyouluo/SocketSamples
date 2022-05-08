@@ -1,16 +1,17 @@
-#include "ServerSocket.h"
+#include "ClientSocket.h"
 #include <iostream>
 
 
-ServerSocket::ServerSocket()
+ClientSocket::ClientSocket()
 {
     m_bInit = false;
-    m_listenfd = INVALID_SOCKET;
+	m_bConnected = false;
+    m_clientfd = INVALID_SOCKET;
 }
 
-ServerSocket::~ServerSocket()
+ClientSocket::~ClientSocket()
 {
-    if ((m_listenfd != INVALID_SOCKET) && (::closesocket(m_listenfd) == SOCKET_ERROR))
+    if ((m_clientfd != INVALID_SOCKET) && (::closesocket(m_clientfd) == SOCKET_ERROR))
     {
         std::cout << "closesocket function failed with error: " 
                 << WSAGetLastError() << std::endl;
@@ -22,41 +23,72 @@ ServerSocket::~ServerSocket()
     }
 }
 
-bool ServerSocket::DoInit()
+bool ClientSocket::DoInit()
 {
-	WSADATA wsaData;
-	int wsa_err = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (wsa_err != 0) 
+    if(m_bInit==false)
     {
-		std::cout << "WSAStartup failed with error: " << wsa_err << std::endl;
-		return false;
-	}
-    if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
-    {
-        return false;
+        WSADATA wsaData;
+        int wsa_err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (wsa_err != 0) 
+        {
+            std::cout << "WSAStartup failed with error: " << wsa_err << std::endl;
+            return false;
+        }
+        if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+        {
+            return false;
+        }
+        m_bInit = true;
     }
-    m_bInit = true;
-
-	//创建监听套接字
-	m_listenfd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (m_listenfd == INVALID_SOCKET)
-	{
-		std::cout << "socket function failed with error: " 
-                << WSAGetLastError() << std::endl;
-		return false;
-	}
+    if(m_clientfd == INVALID_SOCKET)
+    {
+        //创建套接字
+        std::cout << "create client socket" << std::endl;
+        m_clientfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (m_clientfd == INVALID_SOCKET) 
+        {
+            std::cout << "socket function failed with error: " << WSAGetLastError() << std::endl;
+            return false;
+        }
+        m_bConnected = false;
+    }
     return true;
 }
 
-//绑定套接字
-bool ServerSocket::DoBind(const char* ip, unsigned short port)
+
+bool ClientSocket::DoConnect(const char* ip, unsigned short port)
+{
+    if(m_bConnected)
+    {
+        std::cout << "already connected before!" << std::endl;
+        return true;
+    }
+    //向服务器发起连接请求
+    sockaddr_in serveraddr;
+    memset(&serveraddr, 0, sizeof(serveraddr));  //每个字节都用0填充
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_addr.s_addr = inet_addr(ip);
+    serveraddr.sin_port = htons(port);
+    if (connect(m_clientfd, (SOCKADDR*)&serveraddr, sizeof(SOCKADDR)) == SOCKET_ERROR)
+    {
+        std::cout << "connect function failed with error: " << WSAGetLastError() << std::endl;
+        return false;
+    }
+    std::cout << "connect to server successfully." << std::endl;
+    m_bConnected = true;
+    return true;
+}
+
+
+//客户端也是可以绑定端口号的
+bool ClientSocket::DoBind(const char* ip, unsigned short port)
 {
 	sockaddr_in bindaddr;
 	memset(&bindaddr, 0, sizeof(bindaddr));  //每个字节都用0填充
 	bindaddr.sin_family = AF_INET;  //使用IPv4地址
 	bindaddr.sin_addr.s_addr = inet_addr(ip);  //具体的IP地址
 	bindaddr.sin_port = htons(port);  //端口
-	if (::bind(m_listenfd, (SOCKADDR*)&bindaddr, sizeof(SOCKADDR)) == SOCKET_ERROR)
+	if (::bind(m_clientfd, (SOCKADDR*)&bindaddr, sizeof(SOCKADDR)) == SOCKET_ERROR)
 	{
 		std::cout << "bind function failed with error: " 
                 << WSAGetLastError() << std::endl;
@@ -65,39 +97,10 @@ bool ServerSocket::DoBind(const char* ip, unsigned short port)
     return true;
 }
 
-//进入监听状态
-bool ServerSocket::DoListen(int backlog)
-{
-	if (::listen(m_listenfd, backlog) == SOCKET_ERROR)
-	{
-		std::cout << "listen function failed with error: " 
-                << WSAGetLastError() << std::endl;
-		return false;
-	}
-    return true;
-}
-
-//接收客户端连接
-bool ServerSocket::DoAccept()
-{
-    std::cout << "listening on socket ..." << std::endl;
-    SOCKADDR clientaddr;
-    int clientaddrlen = sizeof(clientaddr);
-    m_clientfd = ::accept(m_listenfd, (SOCKADDR*)&clientaddr, &clientaddrlen);
-    if (m_clientfd == INVALID_SOCKET) 
-    {
-        std::cout << "accept function failed with error: " 
-                << WSAGetLastError() << std::endl;
-        return false;
-    }
-    std::cout << "client connected." << std::endl;
-    return true;
-}
-
 //关闭客户端连接
 // false: 关闭连接失败，程序需要退出
 // true: 成功关闭连接
-bool ServerSocket::DoShutdown()
+bool ClientSocket::DoShutdown()
 {
     // shutdown the connection
     std::cout << "shutdown connection ..." << std::endl;
@@ -111,6 +114,7 @@ bool ServerSocket::DoShutdown()
                     << WSAGetLastError() << std::endl;
             return false;
         }
+        m_bConnected = false;
         return false;
     }
     
@@ -126,13 +130,14 @@ bool ServerSocket::DoShutdown()
         return false;
     }
     m_clientfd = INVALID_SOCKET;
+    m_bConnected = false;
     return true;
 }
-bool ServerSocket::Send(const std::string& str)
+bool ClientSocket::Send(const std::string& str)
 {
     return this->Send(str.c_str(), str.size()+1); // 保证'\0'也会被发送过去
 }
-bool ServerSocket::Send(const char* buf, int len)
+bool ClientSocket::Send(const char* buf, int len)
 {
     int sent_bytes = 0;
     int ret = 0;
@@ -153,11 +158,11 @@ bool ServerSocket::Send(const char* buf, int len)
         }
         sent_bytes += ret;
     }
-    std::cout << "send " << sent_bytes << " bytes to client." << std::endl;
+    std::cout << "send " << sent_bytes << " bytes to server." << std::endl;
     return true;
 }
 
-bool ServerSocket::Recv(std::string& str)
+bool ClientSocket::Recv(std::string& str)
 {
     int n_to_recv = m_recv_buff_size;// 准备接收n_to_recv个字节的数据
     bool ret = this->Recv(m_recv_buff, n_to_recv);// n_to_recv会通过实参引用的方式被修改为实际接收到的字节数
@@ -166,20 +171,18 @@ bool ServerSocket::Recv(std::string& str)
     return ret;
 }
 
-bool ServerSocket::Recv(char *buf, int& len)
+bool ClientSocket::Recv(char *buf, int& len)
 {
     int n_recv = recv(m_clientfd, buf, len, NULL);
     if (n_recv > 0) 
     {
-        std::cout << "receive " << n_recv << " bytes from client." << std::endl;
-		len = n_recv;
+        std::cout << "receive " << n_recv << " bytes from server." << std::endl;
         return true;
     }
     else if (n_recv == 0)
     {
         // 只有在对方关闭连接时，recv才会返回0
         std::cout << "recv 0 byte: the peer closed the connection." << std::endl;
-		len = n_recv;
         return false;
     }
     else 
