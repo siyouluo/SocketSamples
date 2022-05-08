@@ -59,6 +59,8 @@ This usually results from trying to connect to a service that is inactive on the
 按理说，在阻塞模式下，`connect`函数会一直阻塞在此处不断尝试连接到服务器，因此有时候需要使用非阻塞方式的客户端.  
 
 但实际测试下，`connect`连接失败就直接返回了, 没有将程序长时间阻塞在此处，这正合我意，就没有必要自寻烦恼了.
-
-
+当然，也可以稍作修改，通过用户指定尝试次数，让客户端连接失败后就再多试几次，等待服务器上线.  
+- https://github.com/siyouluo/SocketSamples/blob/0c57337561b7f3d2c0a056c536b3e5c349c2611f/modules/SocketRAII/ClientSocket/test_ClientSocket.cpp#L13
+- https://github.com/siyouluo/SocketSamples/blob/0c57337561b7f3d2c0a056c536b3e5c349c2611f/modules/SocketRAII/ClientSocket/ClientSocket.h#L15
+- https://github.com/siyouluo/SocketSamples/blob/0c57337561b7f3d2c0a056c536b3e5c349c2611f/modules/SocketRAII/ClientSocket/ClientSocket.cpp#L72-L84
 
