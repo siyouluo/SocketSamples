@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
             return -1;
         //if (!clientSocket.DoBind("127.0.0.1", 1235))
         //    return -1;
-        if (!clientSocket.DoConnect("127.0.0.1", 1234))
+        if (!clientSocket.DoConnect("127.0.0.1", 1234, 10))
             return -1;
         for (int i = 0; i < 5; i++)
         {

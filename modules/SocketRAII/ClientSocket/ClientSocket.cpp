@@ -56,7 +56,7 @@ bool ClientSocket::DoInit()
 }
 
 
-bool ClientSocket::DoConnect(const char* ip, unsigned short port)
+bool ClientSocket::DoConnect(const char* ip, unsigned short port, int n_attempts)
 {
     if(m_bConnected)
     {
@@ -69,14 +69,20 @@ bool ClientSocket::DoConnect(const char* ip, unsigned short port)
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = inet_addr(ip);
     serveraddr.sin_port = htons(port);
-    if (connect(m_clientfd, (SOCKADDR*)&serveraddr, sizeof(SOCKADDR)) == SOCKET_ERROR)
+    for(int i = 0; i < n_attempts; i++)
     {
-        std::cout << "connect function failed with error: " << WSAGetLastError() << std::endl;
-        return false;
+        if (connect(m_clientfd, (SOCKADDR*)&serveraddr, sizeof(SOCKADDR)) == SOCKET_ERROR)
+        {
+            std::cout << "[" << i << "] connect function failed with error: " << WSAGetLastError() << std::endl;
+        }
+        else
+        {
+            std::cout << "connect to server successfully." << std::endl;
+            m_bConnected = true;
+            return true;
+        }
     }
-    std::cout << "connect to server successfully." << std::endl;
-    m_bConnected = true;
-    return true;
+    return false;
 }
 
 

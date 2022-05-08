@@ -12,7 +12,7 @@ public:
 
     bool DoInit();
     bool DoBind(const char* ip, unsigned short port);
-    bool DoConnect(const char* ip, unsigned short port);
+    bool DoConnect(const char* ip, unsigned short port, int n_attempts=1);
     bool DoShutdown();
     bool Send(const char* buf, int len);
     bool Send(const std::string& str);
