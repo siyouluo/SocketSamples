@@ -17,7 +17,7 @@ MODULES\BASICSOCK
 ```
 PS BasicSock> mkdir build
 PS BasicSock> cd build
-PS BasicSock\build> cmake -A x64 ..
+PS BasicSock\build> cmake -G "Visual Studio 15 2017" -T v141 -A x64 ..
 ```
 ## 编译
 在`BasicSock/build`文件夹下双击打开`BasicSock.sln`, 生成解决方案. 并单独生成`INSTALL`项目.

@@ -27,7 +27,7 @@ modules\SocketRAII
 ```
 PS SocketRAII> mkdir build
 PS SocketRAII> cd build
-PS SocketRAII\build> cmake -A x64 ..
+PS SocketRAII\build> cmake -G "Visual Studio 15 2017" -T v141 -A x64 ..
 ```
 ## 编译
 在`SocketRAII/build`文件夹下双击打开`SocketRAII.sln`, 生成解决方案. 并单独生成`INSTALL`项目.
