@@ -106,6 +106,7 @@ QQ 视频聊天和语音聊天就使用 SOCK_DGRAM 传输数据，因为首先�
 - winsock
     - `winsock.h`
     - `Windows.h`
+    - `WSock32.Lib`
 - winsock2
     - `WinSock2.h`
     - `Windows.h`
@@ -116,7 +117,7 @@ QQ 视频聊天和语音聊天就使用 SOCK_DGRAM 传输数据，因为首先�
 - [winsock2编程相关配置](doc/winsock2_program.md)
 - [基础TCP/IP通信例程](doc/basic_tcp.md)
 - [封装TCP/IP通信代码](doc/socket_class_raii.md)
-<!-- - [非阻塞的TCP/IP客户端](doc/non_block_tcp.md) -->
+- [非阻塞的TCP/IP客户端](doc/non_block_tcp.md)
 
 # 参考教程
 - [Overview of the Windows Sockets 2 technology - docs.microsoft](https://docs.microsoft.com/en-us/windows/win32/api/_winsock/)
