@@ -57,53 +57,16 @@ error C2143: 语法错误 : 缺少“;”(在“常量”的前面)
 在`WinSock2.h`中存在定义了一个宏`_WINSOCKAPI_`, 而`winsock.h`中的内容只有在该宏没有被定义时才会生效. 
 因此即使在一个工程中同时引入了`WinSock2.h`和`winsock.h`, 只要`WinSock2.h`先于`winsock.h`被引入就可以避免二者发生冲突.
 
+- https://github.com/siyouluo/SocketSamples/blob/90391c4a9c05948573582ba7af664a3a7d20223f/doc/WindowsSDK/WinSock2.h#L17
 
-- `WinSock2.h`  
-
-```cpp {.line-numbers}
-// WinSock2.h
-#ifndef _WINSOCK2API_
-#define _WINSOCK2API_
-#define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
-...
-/*
- * Pull in WINDOWS.H if necessary
- */
-#ifndef _INC_WINDOWS
-#include <windows.h>
-#endif /* _INC_WINDOWS */
-...
-#endif  /* _WINSOCK2API_ */
-```
-
-- `winsock.h`  
-
-```cpp {.line-numbers}
-// winsock.h
-#include <winapifamily.h>
-
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_
-...
-#endif  /* _WINSOCKAPI_ */
-```
+- https://github.com/siyouluo/SocketSamples/blob/90391c4a9c05948573582ba7af664a3a7d20223f/doc/WindowsSDK/winsock.h#L16-L17
 
 ### 避免间接引入`winsock.h`
 有时即使我们没有主观地引入`winsock.h`，也会发生版本冲突的问题. 
 这主要是因为另一个`Windows SDK`的头文件`Windows.h`间接引入了`winsock.h`.
 当`WIN32_LEAN_AND_MEAN`和`_MAC`都没有被定义时，将会引入`winsock.h`头文件. 
 
-- `Windows.h`   
-
-```cpp {.line-numbers}
-// Windows.h
-#ifndef WIN32_LEAN_AND_MEAN
-#ifndef _MAC
-#include <winperf.h>
-#include <winsock.h>
-#endif
-#endif /* WIN32_LEAN_AND_MEAN */
-```
+- https://github.com/siyouluo/SocketSamples/blob/90391c4a9c05948573582ba7af664a3a7d20223f/doc/WindowsSDK/Windows.h#L182-L197
 
 为了解决这个问题，头文件`WinSock2.h`在整个工程中的引入顺序必须先于`Windows.h`.
 
